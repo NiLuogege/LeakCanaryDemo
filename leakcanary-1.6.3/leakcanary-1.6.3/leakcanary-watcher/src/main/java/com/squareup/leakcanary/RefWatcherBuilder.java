@@ -94,12 +94,14 @@ public class RefWatcherBuilder<T extends RefWatcherBuilder<T>> {
             return RefWatcher.DISABLED;
         }
 
+        //设置 预设的排出项
         if (heapDumpBuilder.excludedRefs == null) {
             heapDumpBuilder.excludedRefs(defaultExcludedRefs());
         }
 
         HeapDump.Listener heapDumpListener = this.heapDumpListener;
         if (heapDumpListener == null) {
+            //一个没做任何事的 Listener
             heapDumpListener = defaultHeapDumpListener();
         }
 

@@ -97,6 +97,7 @@ public final class AndroidRefWatcherBuilder extends RefWatcherBuilder<AndroidRef
         if (LeakCanaryInternals.installedRefWatcher != null) {
             throw new UnsupportedOperationException("buildAndInstall() should only be called once.");
         }
+        //创建 RefWatcher
         RefWatcher refWatcher = build();
         if (refWatcher != DISABLED) {
             if (enableDisplayLeakActivity) {
