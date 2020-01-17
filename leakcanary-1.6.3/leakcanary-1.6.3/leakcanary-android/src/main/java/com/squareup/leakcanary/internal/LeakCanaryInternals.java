@@ -100,17 +100,21 @@ public final class LeakCanaryInternals {
       CanaryLog.d(e, "Could not get package info for %s", context.getPackageName());
       return false;
     }
+
+    //主进程名
     String mainProcess = packageInfo.applicationInfo.processName;
 
     ComponentName component = new ComponentName(context, serviceClass);
     ServiceInfo serviceInfo;
     try {
+      //获取 HeapAnalyzerService 所在进程的信息
       serviceInfo = packageManager.getServiceInfo(component, PackageManager.GET_DISABLED_COMPONENTS);
     } catch (PackageManager.NameNotFoundException ignored) {
       // Service is disabled.
       return false;
     }
 
+    //如果 主进程名和 HeapAnalyzerService 所在的进程名一致 返回false（异常情况）
     if (serviceInfo.processName.equals(mainProcess)) {
       CanaryLog.d("Did not expect service %s to run in main process %s", serviceClass, mainProcess);
       // Technically we are in the service process, but we're not in the service dedicated process.
@@ -137,6 +141,7 @@ public final class LeakCanaryInternals {
         }
       }
     }
+    //异常情况处理
     if (myProcess == null) {
       CanaryLog.d("Could not find running process for %d", myPid);
       return false;

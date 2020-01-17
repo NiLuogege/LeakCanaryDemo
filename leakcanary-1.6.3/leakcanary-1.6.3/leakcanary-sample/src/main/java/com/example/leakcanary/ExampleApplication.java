@@ -26,7 +26,8 @@ public class ExampleApplication extends Application {
   }
 
   protected void setupLeakCanary() {
-    enabledStrictMode();
+//    enabledStrictMode();
+    //如果是 在HeapAnalyzerService 的进程则 不开启 LeakCanary。如果不是则开启
     if (LeakCanary.isInAnalyzerProcess(this)) {
       // This process is dedicated to LeakCanary for heap analysis.
       // You should not init your app in this process.
@@ -36,6 +37,7 @@ public class ExampleApplication extends Application {
   }
 
   private static void enabledStrictMode() {
+    //开启严苛模式，用于调试代码
     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder() //
         .detectAll() //
         .penaltyLog() //

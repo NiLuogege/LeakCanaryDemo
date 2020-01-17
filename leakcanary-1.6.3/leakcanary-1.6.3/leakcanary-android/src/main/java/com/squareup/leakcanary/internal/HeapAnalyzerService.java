@@ -32,6 +32,8 @@ import static com.squareup.leakcanary.internal.LeakCanaryInternals.setEnabledBlo
 /**
  * This service runs in a separate process to avoid slowing down the app process or making it run
  * out of memory.
+ *
+ * 运行在独立 进程中 进程名为 packageName:leakcanary
  */
 public final class HeapAnalyzerService extends ForegroundService
     implements AnalyzerProgressListener {
