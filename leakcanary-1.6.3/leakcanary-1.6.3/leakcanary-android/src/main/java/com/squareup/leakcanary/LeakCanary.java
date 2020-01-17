@@ -41,8 +41,8 @@ public final class LeakCanary {
     public static @NonNull
     RefWatcher install(@NonNull Application application) {
         return refWatcher(application)
-                .listenerServiceClass(DisplayLeakService.class)
-                .excludedRefs(AndroidExcludedRefs.createAppDefaults().build())
+                .listenerServiceClass(DisplayLeakService.class)//设置处理结果的service为 DisplayLeakService
+                .excludedRefs(AndroidExcludedRefs.createAppDefaults().build())//排查已知厂商的泄漏点
                 .buildAndInstall();
     }
 
@@ -182,6 +182,8 @@ public final class LeakCanary {
     /**
      * Whether the current process is the process running the {@link HeapAnalyzerService}, which is
      * a different process than the normal app process.
+     *
+     * 判断是否是 HeapAnalyzerService 进程
      */
     public static boolean isInAnalyzerProcess(@NonNull Context context) {
         Boolean isInAnalyzerProcess = LeakCanaryInternals.isInAnalyzerProcess;

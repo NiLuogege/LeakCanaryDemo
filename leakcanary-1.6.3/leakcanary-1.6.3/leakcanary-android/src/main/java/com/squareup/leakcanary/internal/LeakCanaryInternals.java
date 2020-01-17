@@ -127,6 +127,7 @@ public final class LeakCanaryInternals {
     ActivityManager.RunningAppProcessInfo myProcess = null;
     List<ActivityManager.RunningAppProcessInfo> runningProcesses;
     try {
+      //获取到当前APP所有的进程
       runningProcesses = activityManager.getRunningAppProcesses();
     } catch (SecurityException exception) {
       // https://github.com/square/leakcanary/issues/948
