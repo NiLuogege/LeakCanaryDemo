@@ -41,6 +41,7 @@ public abstract class AbstractAnalysisResultService extends ForegroundService {
         }
         Intent intent = new Intent(context, listenerServiceClass);
 
+        //将解析结果保存到本地
         File analyzedHeapFile = AnalyzedHeap.save(heapDump, result);
         if (analyzedHeapFile != null) {
             intent.putExtra(ANALYZED_HEAP_PATH_EXTRA, analyzedHeapFile.getAbsolutePath());
@@ -49,8 +50,7 @@ public abstract class AbstractAnalysisResultService extends ForegroundService {
     }
 
     public AbstractAnalysisResultService() {
-        super(AbstractAnalysisResultService.class.getName(),
-                R.string.leak_canary_notification_reporting);
+        super(AbstractAnalysisResultService.class.getName(), R.string.leak_canary_notification_reporting);
     }
 
     @Override
@@ -64,6 +64,7 @@ public abstract class AbstractAnalysisResultService extends ForegroundService {
             return;
         }
         File analyzedHeapFile = new File(intent.getStringExtra(ANALYZED_HEAP_PATH_EXTRA));
+        //加载解析结果
         AnalyzedHeap analyzedHeap = AnalyzedHeap.load(analyzedHeapFile);
         if (analyzedHeap == null) {
             onAnalysisResultFailure(getString(R.string.leak_canary_result_failure_no_file));

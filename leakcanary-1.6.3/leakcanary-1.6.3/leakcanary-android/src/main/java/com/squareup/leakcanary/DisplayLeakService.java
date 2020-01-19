@@ -48,13 +48,14 @@ public class DisplayLeakService extends AbstractAnalysisResultService {
         String leakInfo = leakInfo(this, heapDump, result, true);
         CanaryLog.d("%s", leakInfo);
 
+        //对分析过的 文件改名字
         heapDump = renameHeapdump(heapDump);
         boolean resultSaved = saveResult(heapDump, result);
 
         String contentTitle;
+        //发送一个通知告诉开发者 内存泄漏了
         if (resultSaved) {
-            PendingIntent pendingIntent =
-                    DisplayLeakActivity.createPendingIntent(this, heapDump.referenceKey);
+            PendingIntent pendingIntent = DisplayLeakActivity.createPendingIntent(this, heapDump.referenceKey);
             if (result.failure != null) {
                 contentTitle = getString(R.string.leak_canary_analysis_failed);
             } else {

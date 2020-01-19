@@ -70,6 +70,7 @@ public final class HeapAnalyzerService extends ForegroundService implements Anal
         HeapAnalyzer heapAnalyzer = new HeapAnalyzer(heapDump.excludedRefs, this, heapDump.reachabilityInspectorClasses);
         //找到泄漏点并分析出 到GCRoot的最短路径 存储到 AnalysisResult
         AnalysisResult result = heapAnalyzer.checkForLeak(heapDump.heapDumpFile, heapDump.referenceKey, heapDump.computeRetainedHeapSize);
+        //将结果发送给  DisplayLeakService 处理 （listenerClassName-->DisplayLeakService）
         AbstractAnalysisResultService.sendResultToListener(this, listenerClassName, heapDump, result);
     }
 
