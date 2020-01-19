@@ -259,6 +259,7 @@ public final class HeapAnalyzer {
     private AnalysisResult findLeakTrace(long analysisStartNanoTime, Snapshot snapshot, Instance leakingRef, boolean computeRetainedSize) {
 
         listener.onProgressUpdate(FINDING_SHORTEST_PATH);
+        //最短引用查找器
         ShortestPathFinder pathFinder = new ShortestPathFinder(excludedRefs);
         ShortestPathFinder.Result result = pathFinder.findPath(snapshot, leakingRef);
 
