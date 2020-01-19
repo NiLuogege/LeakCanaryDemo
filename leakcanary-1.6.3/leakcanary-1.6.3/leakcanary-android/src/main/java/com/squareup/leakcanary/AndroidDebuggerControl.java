@@ -16,7 +16,7 @@
 package com.squareup.leakcanary;
 
 import android.os.Debug;
-
+//是否是调试状态
 public final class AndroidDebuggerControl implements DebuggerControl {
   @Override public boolean isDebuggerAttached() {
     return Debug.isDebuggerConnected();

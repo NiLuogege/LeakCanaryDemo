@@ -105,6 +105,7 @@ public class RefWatcherBuilder<T extends RefWatcherBuilder<T>> {
             heapDumpListener = defaultHeapDumpListener();
         }
 
+        //debug模式时的开关
         DebuggerControl debuggerControl = this.debuggerControl;
         if (debuggerControl == null) {
             debuggerControl = defaultDebuggerControl();

@@ -35,6 +35,7 @@ public final class AndroidRefWatcherBuilder extends RefWatcherBuilder<AndroidRef
      */
     public @NonNull
     AndroidRefWatcherBuilder listenerServiceClass(@NonNull Class<? extends AbstractAnalysisResultService> listenerServiceClass) {
+        //这里不仅判断了用于展示的Service是否是 DisplayLeakService 还判断了是否是 他的衍生类。不得不是 世界顶级程序员真的不一样啊。
         enableDisplayLeakActivity = DisplayLeakService.class.isAssignableFrom(listenerServiceClass);
         return heapDumpListener(new ServiceHeapDumpListener(context, listenerServiceClass));
     }
@@ -100,12 +101,15 @@ public final class AndroidRefWatcherBuilder extends RefWatcherBuilder<AndroidRef
         //创建 RefWatcher
         RefWatcher refWatcher = build();
         if (refWatcher != DISABLED) {
+            //是否展示默认的泄漏activity
             if (enableDisplayLeakActivity) {
                 LeakCanaryInternals.setEnabledAsync(context, DisplayLeakActivity.class, true);
             }
+            //是否要监测activity
             if (watchActivities) {
                 ActivityRefWatcher.install(context, refWatcher);
             }
+            //是否要监测fragment
             if (watchFragments) {
                 FragmentRefWatcher.Helper.install(context, refWatcher);
             }
