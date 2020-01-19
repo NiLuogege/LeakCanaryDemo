@@ -79,8 +79,7 @@ public final class LeakCanary {
      * @deprecated Use {@link #setLeakDirectoryProvider(LeakDirectoryProvider)} instead.
      */
     @Deprecated
-    public static void setDisplayLeakActivityDirectoryProvider(
-            @NonNull LeakDirectoryProvider leakDirectoryProvider) {
+    public static void setDisplayLeakActivityDirectoryProvider(@NonNull LeakDirectoryProvider leakDirectoryProvider) {
         setLeakDirectoryProvider(leakDirectoryProvider);
     }
 
@@ -91,8 +90,7 @@ public final class LeakCanary {
      * @throws IllegalStateException if a LeakDirectoryProvider has already been set, including
      *                               if the default has been automatically set when installing the ref watcher.
      */
-    public static void setLeakDirectoryProvider(
-            @NonNull LeakDirectoryProvider leakDirectoryProvider) {
+    public static void setLeakDirectoryProvider(@NonNull LeakDirectoryProvider leakDirectoryProvider) {
         LeakCanaryInternals.setLeakDirectoryProvider(leakDirectoryProvider);
     }
 
@@ -182,7 +180,7 @@ public final class LeakCanary {
     /**
      * Whether the current process is the process running the {@link HeapAnalyzerService}, which is
      * a different process than the normal app process.
-     *
+     * <p>
      * 判断是否是 HeapAnalyzerService 进程
      */
     public static boolean isInAnalyzerProcess(@NonNull Context context) {
