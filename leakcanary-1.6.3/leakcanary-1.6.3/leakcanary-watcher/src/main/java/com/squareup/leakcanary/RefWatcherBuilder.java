@@ -88,36 +88,41 @@ public class RefWatcherBuilder<T extends RefWatcherBuilder<T>> {
 
     /**
      * Creates a {@link RefWatcher}.
+     *
+     * build方法中 基本上都会走到default...方法中 。也就会调用 AndroidRefWatcherBuilder 中的方法
      */
     public final RefWatcher build() {
         if (isDisabled()) {
             return RefWatcher.DISABLED;
         }
 
-        //设置 预设的排出项
+        //设置 预设的排除项
         if (heapDumpBuilder.excludedRefs == null) {
             heapDumpBuilder.excludedRefs(defaultExcludedRefs());
         }
 
         HeapDump.Listener heapDumpListener = this.heapDumpListener;
         if (heapDumpListener == null) {
-            //一个没做任何事的 Listener
+            //会调用到AndroidRefWatcherBuilder的defaultHeapDumpListener方法中 最后的listener 是 ServiceHeapDumpListener
             heapDumpListener = defaultHeapDumpListener();
         }
 
         //debug模式时的开关
         DebuggerControl debuggerControl = this.debuggerControl;
         if (debuggerControl == null) {
+            //默认情况下 一样会走到  AndroidRefWatcherBuilder的 defaultDebuggerControl
             debuggerControl = defaultDebuggerControl();
         }
 
         HeapDumper heapDumper = this.heapDumper;
         if (heapDumper == null) {
+            //同上
             heapDumper = defaultHeapDumper();
         }
 
         WatchExecutor watchExecutor = this.watchExecutor;
         if (watchExecutor == null) {
+            //同上
             watchExecutor = defaultWatchExecutor();
         }
 
@@ -127,6 +132,7 @@ public class RefWatcherBuilder<T extends RefWatcherBuilder<T>> {
         }
 
         if (heapDumpBuilder.reachabilityInspectorClasses == null) {
+            //同上
             heapDumpBuilder.reachabilityInspectorClasses(defaultReachabilityInspectorClasses());
         }
 

@@ -17,23 +17,25 @@ package com.squareup.leakcanary;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+
 import com.squareup.leakcanary.internal.HeapAnalyzerService;
 
 import static com.squareup.leakcanary.Preconditions.checkNotNull;
 
 public final class ServiceHeapDumpListener implements HeapDump.Listener {
 
-  private final Context context;
-  private final Class<? extends AbstractAnalysisResultService> listenerServiceClass;
+    private final Context context;
+    private final Class<? extends AbstractAnalysisResultService> listenerServiceClass;
 
-  public ServiceHeapDumpListener(@NonNull final Context context,
-      @NonNull final Class<? extends AbstractAnalysisResultService> listenerServiceClass) {
-    this.listenerServiceClass = checkNotNull(listenerServiceClass, "listenerServiceClass");
-    this.context = checkNotNull(context, "context").getApplicationContext();
-  }
+    public ServiceHeapDumpListener(@NonNull final Context context,
+                                   @NonNull final Class<? extends AbstractAnalysisResultService> listenerServiceClass) {
+        this.listenerServiceClass = checkNotNull(listenerServiceClass, "listenerServiceClass");
+        this.context = checkNotNull(context, "context").getApplicationContext();
+    }
 
-  @Override public void analyze(@NonNull HeapDump heapDump) {
-    checkNotNull(heapDump, "heapDump");
-    HeapAnalyzerService.runAnalysis(context, heapDump, listenerServiceClass);
-  }
+    @Override
+    public void analyze(@NonNull HeapDump heapDump) {
+        checkNotNull(heapDump, "heapDump");
+        HeapAnalyzerService.runAnalysis(context, heapDump, listenerServiceClass);
+    }
 }
