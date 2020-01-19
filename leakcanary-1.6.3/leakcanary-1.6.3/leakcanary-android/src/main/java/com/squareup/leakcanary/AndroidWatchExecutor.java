@@ -77,9 +77,20 @@ public final class AndroidWatchExecutor implements WatchExecutor {
     });
   }
 
+  /**
+   *
+   * @param retryable 是否可尝试
+   * @param failedAttempts 失败后重试次数
+   */
   private void postToBackgroundWithDelay(final Retryable retryable, final int failedAttempts) {
     long exponentialBackoffFactor = (long) Math.min(Math.pow(2, failedAttempts), maxBackoffFactor);
     long delayMillis = initialDelayMillis * exponentialBackoffFactor;
+    CanaryLog.d("failedAttempts= %s, maxBackoffFactor= %s, exponentialBackoffFactor= %s, delayMillis= %s",
+            failedAttempts,
+            maxBackoffFactor,
+            exponentialBackoffFactor,
+            delayMillis
+    );
     backgroundHandler.postDelayed(new Runnable() {
       @Override public void run() {
         Retryable.Result result = retryable.run();
