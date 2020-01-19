@@ -84,6 +84,7 @@ final class ShortestPathFinder {
         //如果 泄漏点不是string 就可以忽略String的排查
         canIgnoreStrings = !isString(leakingRef);
 
+        //将 gcroot 加入到队列中 （toVisitSet和toVisitQueue 或者  toVisitIfNoPathSet和 toVisitIfNoPathQueue）
         enqueueGcRoots(snapshot);
 
         boolean excludingKnownLeaks = false;
@@ -101,6 +102,7 @@ final class ShortestPathFinder {
             }
 
             // Termination
+            //找到了泄漏点就终止
             if (node.instance == leakingRef) {
                 leakingNode = node;
                 break;
@@ -110,6 +112,7 @@ final class ShortestPathFinder {
                 continue;
             }
 
+            //将 gcroot的子节点 放入队列中  （toVisitSet和toVisitQueue 或者  toVisitIfNoPathSet和 toVisitIfNoPathQueue）
             if (node.instance instanceof RootObj) {
                 visitRootObj(node);
             } else if (node.instance instanceof ClassObj) {
@@ -290,8 +293,7 @@ final class ShortestPathFinder {
         }
     }
 
-    private void enqueue(Exclusion exclusion, LeakNode parent, Instance child,
-                         LeakReference leakReference) {
+    private void enqueue(Exclusion exclusion, LeakNode parent, Instance child, LeakReference leakReference) {
         if (child == null) {
             return;
         }

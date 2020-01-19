@@ -261,19 +261,24 @@ public final class HeapAnalyzer {
         listener.onProgressUpdate(FINDING_SHORTEST_PATH);
         //最短引用查找器
         ShortestPathFinder pathFinder = new ShortestPathFinder(excludedRefs);
+        //查找到了 泄漏点也找到了 引用关系
         ShortestPathFinder.Result result = pathFinder.findPath(snapshot, leakingRef);
 
         String className = leakingRef.getClassObj().getClassName();
 
         // False alarm, no strong reference path to GC Roots.
+        // 没有泄漏 因为没有找到 引用的GcRoot
         if (result.leakingNode == null) {
             return noLeak(className, since(analysisStartNanoTime));
         }
 
         listener.onProgressUpdate(BUILDING_LEAK_TRACE);
+
+        //将 leakingNode 转换为 LeakTrace
         LeakTrace leakTrace = buildLeakTrace(result.leakingNode);
 
         long retainedSize;
+        //是否计算泄漏的大小
         if (computeRetainedSize) {
 
             listener.onProgressUpdate(COMPUTING_DOMINATORS);
@@ -363,8 +368,7 @@ public final class HeapAnalyzer {
             node = node.parent;
         }
 
-        List<Reachability> expectedReachability =
-                computeExpectedReachability(elements);
+        List<Reachability> expectedReachability = computeExpectedReachability(elements);
 
         return new LeakTrace(elements, expectedReachability);
     }
