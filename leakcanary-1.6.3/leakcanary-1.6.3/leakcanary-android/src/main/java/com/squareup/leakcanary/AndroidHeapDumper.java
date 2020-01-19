@@ -73,12 +73,15 @@ public final class AndroidHeapDumper implements HeapDumper {
     @Override
     @Nullable
     public File dumpHeap() {
+        //产生一个新的 .hprof文件对象
         File heapDumpFile = leakDirectoryProvider.newHeapDumpFile();
 
+        //判空
         if (heapDumpFile == RETRY_LATER) {
             return RETRY_LATER;
         }
 
+        //弹出Toast 告知开发者 正在 dump heap
         FutureResult<Toast> waitingForToast = new FutureResult<>();
         showToast(waitingForToast);
 
@@ -97,6 +100,7 @@ public final class AndroidHeapDumper implements HeapDumper {
 
         Toast toast = waitingForToast.get();
         try {
+            // 开始生成 .hprof 问加你
             Debug.dumpHprofData(heapDumpFile.getAbsolutePath());
             cancelToast(toast);
             notificationManager.cancel(notificationId);
