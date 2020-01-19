@@ -76,6 +76,7 @@ public final class RefWatcher {
      * @param referenceName An logical identifier for the watched object.
      */
     public void watch(Object watchedReference, String referenceName) {
+        //如果不可用直接 返回
         if (this == DISABLED) {
             return;
         }
@@ -83,9 +84,10 @@ public final class RefWatcher {
         checkNotNull(referenceName, "referenceName");
         final long watchStartNanoTime = System.nanoTime();
         String key = UUID.randomUUID().toString();
+        //创建个随机数 并装入 retainedKeys
         retainedKeys.add(key);
-        final KeyedWeakReference reference =
-                new KeyedWeakReference(watchedReference, key, referenceName, queue);
+        //将watchedReference 使用 WeakReference 进行包装，并且绑定一个 key
+        final KeyedWeakReference reference = new KeyedWeakReference(watchedReference, key, referenceName, queue);
 
         ensureGoneAsync(watchStartNanoTime, reference);
     }
