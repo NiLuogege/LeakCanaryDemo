@@ -88,7 +88,7 @@ public final class LeakCanaryInternals {
     }
 
     /**
-     * 设置可以冻结 应用？？从而 drump 内存信息？
+     * 设置组件是否启用，但不知道为什么要设置
      */
     public static void setEnabledBlocking(Context appContext, Class<?> componentClass, boolean enabled) {
         ComponentName component = new ComponentName(appContext, componentClass);

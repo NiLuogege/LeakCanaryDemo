@@ -34,14 +34,14 @@ import static com.squareup.leakcanary.internal.LeakCanaryInternals.setEnabledBlo
  * This service runs in a separate process to avoid slowing down the app process or making it run
  * out of memory.
  * <p>
- * 运行在独立 进程中 进程名为 packageName:leakcanary
+ * 运行在独立 进程中 是一个IntentService 接受Intent 执行任务的 进程名为 packageName:leakcanary
  */
-public final class HeapAnalyzerService extends ForegroundService
-        implements AnalyzerProgressListener {
+public final class HeapAnalyzerService extends ForegroundService implements AnalyzerProgressListener {
 
     private static final String LISTENER_CLASS_EXTRA = "listener_class_extra";
     private static final String HEAPDUMP_EXTRA = "heapdump_extra";
 
+    //listenerServiceClass-->DisplayLeakService
     public static void runAnalysis(Context context, HeapDump heapDump,
                                    Class<? extends AbstractAnalysisResultService> listenerServiceClass) {
         setEnabledBlocking(context, HeapAnalyzerService.class, true);
@@ -49,6 +49,7 @@ public final class HeapAnalyzerService extends ForegroundService
         Intent intent = new Intent(context, HeapAnalyzerService.class);
         intent.putExtra(LISTENER_CLASS_EXTRA, listenerServiceClass.getName());
         intent.putExtra(HEAPDUMP_EXTRA, heapDump);
+        //发送一个Intent任务
         ContextCompat.startForegroundService(context, intent);
     }
 
@@ -65,16 +66,16 @@ public final class HeapAnalyzerService extends ForegroundService
         String listenerClassName = intent.getStringExtra(LISTENER_CLASS_EXTRA);
         HeapDump heapDump = (HeapDump) intent.getSerializableExtra(HEAPDUMP_EXTRA);
 
-        HeapAnalyzer heapAnalyzer =
-                new HeapAnalyzer(heapDump.excludedRefs, this, heapDump.reachabilityInspectorClasses);
-
-        AnalysisResult result = heapAnalyzer.checkForLeak(heapDump.heapDumpFile, heapDump.referenceKey,
-                heapDump.computeRetainedHeapSize);
+        //创建 HeapAnalyzer 对象
+        HeapAnalyzer heapAnalyzer = new HeapAnalyzer(heapDump.excludedRefs, this, heapDump.reachabilityInspectorClasses);
+        //找到泄漏点并分析出 到GCRoot的最短路径 存储到 AnalysisResult
+        AnalysisResult result = heapAnalyzer.checkForLeak(heapDump.heapDumpFile, heapDump.referenceKey, heapDump.computeRetainedHeapSize);
         AbstractAnalysisResultService.sendResultToListener(this, listenerClassName, heapDump, result);
     }
 
     @Override
     public void onProgressUpdate(Step step) {
+        //这个百分比是完成的步骤的 百分比
         int percent = (int) ((100f * step.ordinal()) / Step.values().length);
         CanaryLog.d("Analysis in progress, working on: %s", step.name());
         String lowercase = step.name().replace("_", " ").toLowerCase();
