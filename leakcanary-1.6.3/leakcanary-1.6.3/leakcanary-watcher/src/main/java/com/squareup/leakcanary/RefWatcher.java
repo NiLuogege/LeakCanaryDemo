@@ -45,6 +45,7 @@ public final class RefWatcher {
     private final HeapDump.Listener heapdumpListener;
     private final HeapDump.Builder heapDumpBuilder;
     private final Set<String> retainedKeys;
+    //被弱引用 回收后 会将弱引用对象 加入到这个队列中
     private final ReferenceQueue<Object> queue;
 
     RefWatcher(WatchExecutor watchExecutor, DebuggerControl debuggerControl, GcTrigger gcTrigger,
@@ -86,7 +87,7 @@ public final class RefWatcher {
         String key = UUID.randomUUID().toString();
         //创建个随机数 并装入 retainedKeys
         retainedKeys.add(key);
-        //将watchedReference 使用 WeakReference 进行包装，并且绑定一个 key
+        //将watchedReference 使用 WeakReference 进行包装 生成一个弱引用对象，并且绑定一个 key
         final KeyedWeakReference reference = new KeyedWeakReference(watchedReference, key, referenceName, queue);
 
         ensureGoneAsync(watchStartNanoTime, reference);
@@ -126,39 +127,54 @@ public final class RefWatcher {
         // Explicitly checking for named null.
     Retryable.Result ensureGone(final KeyedWeakReference reference, final long watchStartNanoTime) {
         long gcStartNanoTime = System.nanoTime();
+        //监测了多长时间
         long watchDurationMs = NANOSECONDS.toMillis(gcStartNanoTime - watchStartNanoTime);
 
+        //移除已经被回收了的 对象和 key
         removeWeaklyReachableReferences();
 
+        //如果连接了调试 就进行重试
         if (debuggerControl.isDebuggerAttached()) {
             // The debugger can create false leaks.
             return RETRY;
         }
+        //已经被回收 也不往下走
         if (gone(reference)) {
             return DONE;
         }
+
+        //通知虚拟机 Gc
         gcTrigger.runGc();
+
+        //gc 后再次 移除已经被回收了的 对象和 key。
         removeWeaklyReachableReferences();
+
+        //有没有被回收的对象
         if (!gone(reference)) {
             long startDumpHeap = System.nanoTime();
             long gcDurationMs = NANOSECONDS.toMillis(startDumpHeap - gcStartNanoTime);
 
+            //生成.hprof 文件
             File heapDumpFile = heapDumper.dumpHeap();
+            // dump heap 没有成功
             if (heapDumpFile == RETRY_LATER) {
                 // Could not dump the heap.
                 return RETRY;
             }
             long heapDumpDurationMs = NANOSECONDS.toMillis(System.nanoTime() - startDumpHeap);
 
-            HeapDump heapDump = heapDumpBuilder.heapDumpFile(heapDumpFile).referenceKey(reference.key)
+            HeapDump heapDump = heapDumpBuilder.heapDumpFile(heapDumpFile)
+                    .referenceKey(reference.key)
                     .referenceName(reference.name)
                     .watchDurationMs(watchDurationMs)
                     .gcDurationMs(gcDurationMs)
                     .heapDumpDurationMs(heapDumpDurationMs)
                     .build();
 
+            //分析heapDump
             heapdumpListener.analyze(heapDump);
         }
+        //完成
         return DONE;
     }
 
@@ -166,6 +182,7 @@ public final class RefWatcher {
         return !retainedKeys.contains(reference.key);
     }
 
+    //移除已经被回收了的 对象和 key
     private void removeWeaklyReachableReferences() {
         // WeakReferences are enqueued as soon as the object to which they point to becomes weakly
         // reachable. This is before finalization or garbage collection has actually happened.

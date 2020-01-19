@@ -26,6 +26,7 @@ import static com.squareup.leakcanary.Preconditions.checkNotNull;
  */
 final class KeyedWeakReference extends WeakReference<Object> {
     public final String key;
+    //这个name默认是 空字符串
     public final String name;
 
     KeyedWeakReference(Object referent, String key, String name, ReferenceQueue<Object> referenceQueue) {
