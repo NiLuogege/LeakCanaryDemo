@@ -96,16 +96,20 @@ public final class DefaultLeakDirectoryProvider implements LeakDirectoryProvider
     // Otherwise we move forward and assume that the analyzer process crashes. The file will
     // eventually be removed with heap dump file rotation.
     for (File file : pendingHeapDumps) {
+      //存在.hprof文件并且尚未处理 则返回null
       if (System.currentTimeMillis() - file.lastModified() < ANALYSIS_MAX_DURATION_MS) {
         CanaryLog.d("Could not dump heap, previous analysis still is in progress.");
         return RETRY_LATER;
       }
     }
 
+    //删除之前的 .hprof文件
     cleanupOldHeapDumps();
 
     File storageDirectory = externalStorageDirectory();
+    //download 文件夹 不可正常写入 就降级到 appStorageDirectory 如果 appStorageDirectory也不可用 就返回null
     if (!directoryWritableAfterMkdirs(storageDirectory)) {
+      //没有存储权限是 申请存储权限
       if (!hasStoragePermission()) {
         CanaryLog.d("WRITE_EXTERNAL_STORAGE permission not granted");
         requestWritePermissionNotification();
@@ -128,6 +132,7 @@ public final class DefaultLeakDirectoryProvider implements LeakDirectoryProvider
     }
     // If two processes from the same app get to this step at the same time, they could both
     // create a heap dump. This is an edge case we ignore.
+    // download文件夹下 创建一个 .hprof文件
     return new File(storageDirectory, UUID.randomUUID().toString() + PENDING_HEAPDUMP_SUFFIX);
   }
 

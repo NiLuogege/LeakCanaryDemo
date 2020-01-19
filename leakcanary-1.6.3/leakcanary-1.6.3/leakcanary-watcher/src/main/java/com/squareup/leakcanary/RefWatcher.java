@@ -115,6 +115,7 @@ public final class RefWatcher {
     }
 
     private void ensureGoneAsync(final long watchStartNanoTime, final KeyedWeakReference reference) {
+        //在 watchExecutor 中延时 一段时间后执行 ensureGone
         watchExecutor.execute(new Retryable() {
             @Override
             public Retryable.Result run() {
