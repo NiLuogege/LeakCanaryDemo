@@ -298,8 +298,7 @@ public final class HeapAnalyzer {
             retainedSize = AnalysisResult.RETAINED_HEAP_SKIPPED;
         }
 
-        return leakDetected(result.excludingKnownLeaks, className, leakTrace, retainedSize,
-                since(analysisStartNanoTime));
+        return leakDetected(result.excludingKnownLeaks, className, leakTrace, retainedSize, since(analysisStartNanoTime));
     }
 
     /**

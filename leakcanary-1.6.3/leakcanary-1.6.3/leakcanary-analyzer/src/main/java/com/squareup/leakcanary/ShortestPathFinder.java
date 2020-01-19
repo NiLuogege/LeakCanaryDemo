@@ -70,7 +70,7 @@ final class ShortestPathFinder {
 
     static final class Result {
         final LeakNode leakingNode;
-        final boolean excludingKnownLeaks;
+        final boolean excludingKnownLeaks;//是否包含一致的写楼梯
 
         Result(LeakNode leakingNode, boolean excludingKnownLeaks) {
             this.leakingNode = leakingNode;
@@ -87,6 +87,7 @@ final class ShortestPathFinder {
         //将 gcroot 加入到队列中 （toVisitSet和toVisitQueue 或者  toVisitIfNoPathSet和 toVisitIfNoPathQueue）
         enqueueGcRoots(snapshot);
 
+        //是否包含已知的泄漏
         boolean excludingKnownLeaks = false;
         LeakNode leakingNode = null;
         while (!toVisitQueue.isEmpty() || !toVisitIfNoPathQueue.isEmpty()) {
