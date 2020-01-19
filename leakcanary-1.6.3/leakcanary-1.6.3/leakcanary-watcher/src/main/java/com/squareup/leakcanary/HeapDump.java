@@ -23,173 +23,191 @@ import java.util.List;
 import static com.squareup.leakcanary.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableList;
 
-/** Data structure holding information about a heap dump. */
+/**
+ * Data structure holding information about a heap dump.
+ * <p>
+ * 包含有关堆栈信息的 数据结构
+ */
 public final class HeapDump implements Serializable {
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  /** Receives a heap dump to analyze. */
-  public interface Listener {
-    Listener NONE = new Listener() {
-      @Override public void analyze(HeapDump heapDump) {
-      }
-    };
-
-    void analyze(HeapDump heapDump);
-  }
-
-  /** The heap dump file, which you might want to upload somewhere. */
-  public final File heapDumpFile;
-
-  /**
-   * Key associated to the {@link KeyedWeakReference} used to detect the memory leak.
-   * When analyzing a heap dump, search for all {@link KeyedWeakReference} instances, then open
-   * the one that has its "key" field set to this value. Its "referent" field contains the
-   * leaking object. Computing the shortest path to GC roots on that leaking object should enable
-   * you to figure out the cause of the leak.
-   */
-  public final String referenceKey;
-
-  /**
-   * User defined name to help identify the leaking instance.
-   */
-  public final String referenceName;
-
-  /** References that should be ignored when analyzing this heap dump. */
-  public final ExcludedRefs excludedRefs;
-
-  /** Time from the request to watch the reference until the GC was triggered. */
-  public final long watchDurationMs;
-  public final long gcDurationMs;
-  public final long heapDumpDurationMs;
-  public final boolean computeRetainedHeapSize;
-  public final List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses;
-
-  /**
-   * Calls {@link #HeapDump(Builder)} with computeRetainedHeapSize set to true.
-   *
-   * @deprecated Use {@link #HeapDump(Builder)}  instead.
-   */
-  @Deprecated
-  public HeapDump(File heapDumpFile, String referenceKey, String referenceName,
-      ExcludedRefs excludedRefs, long watchDurationMs, long gcDurationMs, long heapDumpDurationMs) {
-    this(new Builder().heapDumpFile(heapDumpFile)
-        .referenceKey(referenceKey)
-        .referenceName(referenceName)
-        .excludedRefs(excludedRefs)
-        .computeRetainedHeapSize(true)
-        .watchDurationMs(watchDurationMs)
-        .gcDurationMs(gcDurationMs)
-        .heapDumpDurationMs(heapDumpDurationMs));
-  }
-
-  HeapDump(Builder builder) {
-    this.heapDumpFile = builder.heapDumpFile;
-    this.referenceKey = builder.referenceKey;
-    this.referenceName = builder.referenceName;
-    this.excludedRefs = builder.excludedRefs;
-    this.computeRetainedHeapSize = builder.computeRetainedHeapSize;
-    this.watchDurationMs = builder.watchDurationMs;
-    this.gcDurationMs = builder.gcDurationMs;
-    this.heapDumpDurationMs = builder.heapDumpDurationMs;
-    this.reachabilityInspectorClasses = builder.reachabilityInspectorClasses;
-  }
-
-  public Builder buildUpon() {
-    return new Builder(this);
-  }
-
-  public static final class Builder {
-    File heapDumpFile;
-    String referenceKey;
-    String referenceName;
-    ExcludedRefs excludedRefs;
-    long watchDurationMs;
-    long gcDurationMs;
-    long heapDumpDurationMs;
-    boolean computeRetainedHeapSize;
-    List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses;
-
-    Builder() {
-      this.heapDumpFile = null;
-      this.referenceKey = null;
-      referenceName = "";
-      excludedRefs = null;
-      watchDurationMs = 0;
-      gcDurationMs = 0;
-      heapDumpDurationMs = 0;
-      computeRetainedHeapSize = false;
-      reachabilityInspectorClasses = null;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    Builder(HeapDump heapDump) {
-      this.heapDumpFile = heapDump.heapDumpFile;
-      this.referenceKey = heapDump.referenceKey;
-      this.referenceName = heapDump.referenceName;
-      this.excludedRefs = heapDump.excludedRefs;
-      this.computeRetainedHeapSize = heapDump.computeRetainedHeapSize;
-      this.watchDurationMs = heapDump.watchDurationMs;
-      this.gcDurationMs = heapDump.gcDurationMs;
-      this.heapDumpDurationMs = heapDump.heapDumpDurationMs;
-      this.reachabilityInspectorClasses = heapDump.reachabilityInspectorClasses;
+    /**
+     * Receives a heap dump to analyze.
+     */
+    public interface Listener {
+        Listener NONE = new Listener() {
+            @Override
+            public void analyze(HeapDump heapDump) {
+            }
+        };
+
+        void analyze(HeapDump heapDump);
     }
 
-    public Builder heapDumpFile(File heapDumpFile) {
-      this.heapDumpFile = checkNotNull(heapDumpFile, "heapDumpFile");
-      return this;
+    /**
+     * The heap dump file, which you might want to upload somewhere.
+     */
+    public final File heapDumpFile;
+
+    /**
+     * Key associated to the {@link KeyedWeakReference} used to detect the memory leak.
+     * When analyzing a heap dump, search for all {@link KeyedWeakReference} instances, then open
+     * the one that has its "key" field set to this value. Its "referent" field contains the
+     * leaking object. Computing the shortest path to GC roots on that leaking object should enable
+     * you to figure out the cause of the leak.
+     */
+    public final String referenceKey;
+
+    /**
+     * User defined name to help identify the leaking instance.
+     */
+    public final String referenceName;
+
+    /**
+     * References that should be ignored when analyzing this heap dump.
+     */
+    //已知的厂商的内存泄漏点
+    public final ExcludedRefs excludedRefs;
+
+    /**
+     * Time from the request to watch the reference until the GC was triggered.
+     */
+    public final long watchDurationMs;
+    public final long gcDurationMs;
+    public final long heapDumpDurationMs;
+
+    //
+    public final boolean computeRetainedHeapSize;
+
+    //
+    public final List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses;
+
+    /**
+     * Calls {@link #HeapDump(Builder)} with computeRetainedHeapSize set to true.
+     *
+     * @deprecated Use {@link #HeapDump(Builder)}  instead.
+     */
+    @Deprecated
+    public HeapDump(File heapDumpFile, String referenceKey, String referenceName,
+                    ExcludedRefs excludedRefs, long watchDurationMs, long gcDurationMs, long heapDumpDurationMs) {
+        this(new Builder().heapDumpFile(heapDumpFile)
+                .referenceKey(referenceKey)
+                .referenceName(referenceName)
+                .excludedRefs(excludedRefs)
+                .computeRetainedHeapSize(true)
+                .watchDurationMs(watchDurationMs)
+                .gcDurationMs(gcDurationMs)
+                .heapDumpDurationMs(heapDumpDurationMs));
     }
 
-    public Builder referenceKey(String referenceKey) {
-      this.referenceKey = checkNotNull(referenceKey, "referenceKey");
-      return this;
+    HeapDump(Builder builder) {
+        this.heapDumpFile = builder.heapDumpFile;
+        this.referenceKey = builder.referenceKey;
+        this.referenceName = builder.referenceName;
+        this.excludedRefs = builder.excludedRefs;
+        this.computeRetainedHeapSize = builder.computeRetainedHeapSize;
+        this.watchDurationMs = builder.watchDurationMs;
+        this.gcDurationMs = builder.gcDurationMs;
+        this.heapDumpDurationMs = builder.heapDumpDurationMs;
+        this.reachabilityInspectorClasses = builder.reachabilityInspectorClasses;
     }
 
-    public Builder referenceName(String referenceName) {
-      this.referenceName = checkNotNull(referenceName, "referenceName");
-      return this;
+    public Builder buildUpon() {
+        return new Builder(this);
     }
 
-    public Builder excludedRefs(ExcludedRefs excludedRefs) {
-      this.excludedRefs = checkNotNull(excludedRefs, "excludedRefs");
-      return this;
-    }
+    public static final class Builder {
+        File heapDumpFile;
+        String referenceKey;
+        String referenceName;
+        ExcludedRefs excludedRefs;
+        long watchDurationMs;
+        long gcDurationMs;
+        long heapDumpDurationMs;
+        boolean computeRetainedHeapSize;
+        List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses;
 
-    public Builder watchDurationMs(long watchDurationMs) {
-      this.watchDurationMs = watchDurationMs;
-      return this;
-    }
+        Builder() {
+            this.heapDumpFile = null;
+            this.referenceKey = null;
+            referenceName = "";
+            excludedRefs = null;
+            watchDurationMs = 0;
+            gcDurationMs = 0;
+            heapDumpDurationMs = 0;
+            computeRetainedHeapSize = false;
+            reachabilityInspectorClasses = null;
+        }
 
-    public Builder gcDurationMs(long gcDurationMs) {
-      this.gcDurationMs = gcDurationMs;
-      return this;
-    }
+        Builder(HeapDump heapDump) {
+            this.heapDumpFile = heapDump.heapDumpFile;
+            this.referenceKey = heapDump.referenceKey;
+            this.referenceName = heapDump.referenceName;
+            this.excludedRefs = heapDump.excludedRefs;
+            this.computeRetainedHeapSize = heapDump.computeRetainedHeapSize;
+            this.watchDurationMs = heapDump.watchDurationMs;
+            this.gcDurationMs = heapDump.gcDurationMs;
+            this.heapDumpDurationMs = heapDump.heapDumpDurationMs;
+            this.reachabilityInspectorClasses = heapDump.reachabilityInspectorClasses;
+        }
 
-    public Builder heapDumpDurationMs(long heapDumpDurationMs) {
-      this.heapDumpDurationMs = heapDumpDurationMs;
-      return this;
-    }
+        public Builder heapDumpFile(File heapDumpFile) {
+            this.heapDumpFile = checkNotNull(heapDumpFile, "heapDumpFile");
+            return this;
+        }
 
-    public Builder computeRetainedHeapSize(boolean computeRetainedHeapSize) {
-      this.computeRetainedHeapSize = computeRetainedHeapSize;
-      return this;
-    }
+        public Builder referenceKey(String referenceKey) {
+            this.referenceKey = checkNotNull(referenceKey, "referenceKey");
+            return this;
+        }
 
-    public Builder reachabilityInspectorClasses(
-        List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses) {
-      checkNotNull(reachabilityInspectorClasses, "reachabilityInspectorClasses");
-      this.reachabilityInspectorClasses =
-          unmodifiableList(new ArrayList<>(reachabilityInspectorClasses));
-      return this;
-    }
+        public Builder referenceName(String referenceName) {
+            this.referenceName = checkNotNull(referenceName, "referenceName");
+            return this;
+        }
 
-    public HeapDump build() {
-      checkNotNull(excludedRefs, "excludedRefs");
-      checkNotNull(heapDumpFile, "heapDumpFile");
-      checkNotNull(referenceKey, "referenceKey");
-      checkNotNull(reachabilityInspectorClasses, "reachabilityInspectorClasses");
-      return new HeapDump(this);
+        public Builder excludedRefs(ExcludedRefs excludedRefs) {
+            this.excludedRefs = checkNotNull(excludedRefs, "excludedRefs");
+            return this;
+        }
+
+        public Builder watchDurationMs(long watchDurationMs) {
+            this.watchDurationMs = watchDurationMs;
+            return this;
+        }
+
+        public Builder gcDurationMs(long gcDurationMs) {
+            this.gcDurationMs = gcDurationMs;
+            return this;
+        }
+
+        public Builder heapDumpDurationMs(long heapDumpDurationMs) {
+            this.heapDumpDurationMs = heapDumpDurationMs;
+            return this;
+        }
+
+        public Builder computeRetainedHeapSize(boolean computeRetainedHeapSize) {
+            this.computeRetainedHeapSize = computeRetainedHeapSize;
+            return this;
+        }
+
+        public Builder reachabilityInspectorClasses(
+                List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses) {
+            checkNotNull(reachabilityInspectorClasses, "reachabilityInspectorClasses");
+            this.reachabilityInspectorClasses =
+                    unmodifiableList(new ArrayList<>(reachabilityInspectorClasses));
+            return this;
+        }
+
+        public HeapDump build() {
+            checkNotNull(excludedRefs, "excludedRefs");
+            checkNotNull(heapDumpFile, "heapDumpFile");
+            checkNotNull(referenceKey, "referenceKey");
+            checkNotNull(reachabilityInspectorClasses, "reachabilityInspectorClasses");
+            return new HeapDump(this);
+        }
     }
-  }
 }
