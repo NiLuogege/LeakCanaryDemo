@@ -32,12 +32,16 @@ import static com.squareup.leakcanary.Retryable.Result.RETRY;
 public final class AndroidWatchExecutor implements WatchExecutor {
 
   static final String LEAK_CANARY_THREAD_NAME = "LeakCanary-Heap-Dump";
+  //主线程handler
   private final Handler mainHandler;
+  //子线程handler
   private final Handler backgroundHandler;
+  //延迟时间
   private final long initialDelayMillis;
   private final long maxBackoffFactor;
 
   public AndroidWatchExecutor(long initialDelayMillis) {
+    //主线程handler
     mainHandler = new Handler(Looper.getMainLooper());
     HandlerThread handlerThread = new HandlerThread(LEAK_CANARY_THREAD_NAME);
     handlerThread.start();
@@ -47,7 +51,7 @@ public final class AndroidWatchExecutor implements WatchExecutor {
   }
 
   @Override public void execute(@NonNull Retryable retryable) {
-    if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+    if (Looper.getMainLooper().getThread() == Thread.currentThread()) {//主线程
       waitForIdle(retryable, 0);
     } else {
       postWaitForIdle(retryable, 0);
@@ -62,6 +66,7 @@ public final class AndroidWatchExecutor implements WatchExecutor {
     });
   }
 
+  //等待MessageQueue空闲时调用 postToBackgroundWithDelay
   private void waitForIdle(final Retryable retryable, final int failedAttempts) {
     // This needs to be called from the main thread.
     Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() {
