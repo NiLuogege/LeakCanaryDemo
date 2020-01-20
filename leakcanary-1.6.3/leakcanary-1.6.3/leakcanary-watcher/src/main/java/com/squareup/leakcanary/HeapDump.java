@@ -49,6 +49,7 @@ public final class HeapDump implements Serializable {
 
     /**
      * The heap dump file, which you might want to upload somewhere.
+     * 生成的.hprof文件
      */
     public final File heapDumpFile;
 
@@ -58,11 +59,15 @@ public final class HeapDump implements Serializable {
      * the one that has its "key" field set to this value. Its "referent" field contains the
      * leaking object. Computing the shortest path to GC roots on that leaking object should enable
      * you to figure out the cause of the leak.
+     * <p>
+     * 泄漏引用的key 用来在解析/展示时 找到 泄漏点
      */
     public final String referenceKey;
 
     /**
      * User defined name to help identify the leaking instance.
+     * <p>
+     * 泄漏引用的key 名字 默认空字符串
      */
     public final String referenceName;
 
@@ -79,10 +84,10 @@ public final class HeapDump implements Serializable {
     public final long gcDurationMs;
     public final long heapDumpDurationMs;
 
-    //
+    //是否计算泄漏内存的大小
     public final boolean computeRetainedHeapSize;
 
-    //
+    //可达性检测的数组
     public final List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses;
 
     /**
@@ -194,11 +199,9 @@ public final class HeapDump implements Serializable {
             return this;
         }
 
-        public Builder reachabilityInspectorClasses(
-                List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses) {
+        public Builder reachabilityInspectorClasses(List<Class<? extends Reachability.Inspector>> reachabilityInspectorClasses) {
             checkNotNull(reachabilityInspectorClasses, "reachabilityInspectorClasses");
-            this.reachabilityInspectorClasses =
-                    unmodifiableList(new ArrayList<>(reachabilityInspectorClasses));
+            this.reachabilityInspectorClasses = unmodifiableList(new ArrayList<>(reachabilityInspectorClasses));
             return this;
         }
 

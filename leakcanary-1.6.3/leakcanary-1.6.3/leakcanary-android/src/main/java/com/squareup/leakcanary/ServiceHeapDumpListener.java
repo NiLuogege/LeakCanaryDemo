@@ -36,6 +36,7 @@ public final class ServiceHeapDumpListener implements HeapDump.Listener {
     @Override
     public void analyze(@NonNull HeapDump heapDump) {
         checkNotNull(heapDump, "heapDump");
+        //listenerServiceClass--> DisplayLeakService
         HeapAnalyzerService.runAnalysis(context, heapDump, listenerServiceClass);
     }
 }
