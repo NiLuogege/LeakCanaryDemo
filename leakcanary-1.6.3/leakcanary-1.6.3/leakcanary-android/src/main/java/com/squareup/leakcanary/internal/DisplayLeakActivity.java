@@ -41,6 +41,8 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.squareup.leakcanary.AnalysisResult;
 import com.squareup.leakcanary.AnalyzedHeap;
 import com.squareup.leakcanary.CanaryLog;
@@ -100,6 +102,8 @@ public final class DisplayLeakActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    Log.e("DisplayLeakActivity", "啥呀");
+
     if (savedInstanceState != null) {
       visibleLeakRefKey = savedInstanceState.getString("visibleLeakRefKey");
     } else {
@@ -129,6 +133,7 @@ public final class DisplayLeakActivity extends Activity {
     outState.putString("visibleLeakRefKey", visibleLeakRefKey);
   }
 
+  //onResume是解析结果文件展示数据
   @Override protected void onResume() {
     super.onResume();
     LoadLeaks.load(this, getLeakDirectoryProvider(this));
@@ -259,6 +264,7 @@ public final class DisplayLeakActivity extends Activity {
   }
 
   void updateUi() {
+
     if (leaks == null) {
       setTitle("Loading leaks...");
       return;
@@ -277,6 +283,7 @@ public final class DisplayLeakActivity extends Activity {
     listView.setVisibility(VISIBLE);
     failureView.setVisibility(GONE);
 
+    //某个卸扣的详情
     if (visibleLeak != null) {
       AnalysisResult result = visibleLeak.result;
       actionButton.setVisibility(VISIBLE);
@@ -331,7 +338,7 @@ public final class DisplayLeakActivity extends Activity {
         failureMessage += "\n\n" + getString(R.string.leak_canary_download_dump, path);
         failureView.setText(failureMessage);
       }
-    } else {
+    } else {//泄漏列表
       if (listAdapter instanceof LeakListAdapter) {
         ((LeakListAdapter) listAdapter).notifyDataSetChanged();
       } else {
@@ -476,6 +483,7 @@ public final class DisplayLeakActivity extends Activity {
       mainHandler = new Handler(Looper.getMainLooper());
     }
 
+    //找到结果文件，并解析
     @Override public void run() {
       final List<AnalyzedHeap> leaks = new ArrayList<>();
       List<File> files = leakDirectoryProvider.listFiles(new FilenameFilter() {

@@ -17,9 +17,12 @@ package com.example.leakcanary;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
+
+import com.squareup.leakcanary.internal.DisplayLeakActivity;
 
 public class MainActivity extends Activity {
 
@@ -40,6 +43,15 @@ public class MainActivity extends Activity {
     if (httpRequestHelper == null) {
       httpRequestHelper = new HttpRequestHelper(button);
     }
+
+
+    findViewById(R.id.startLeakActivitgy).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startActivity(new Intent(MainActivity.this, DisplayLeakActivity.class));
+      }
+    });
+
   }
 
   @Override public Object onRetainNonConfigurationInstance() {
