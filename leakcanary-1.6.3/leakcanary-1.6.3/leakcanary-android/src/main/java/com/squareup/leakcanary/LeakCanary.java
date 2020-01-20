@@ -37,13 +37,15 @@ public final class LeakCanary {
     /**
      * Creates a {@link RefWatcher} that works out of the box, and starts watching activity
      * references (on ICS+).
+     *
+     * 入口
      */
     public static @NonNull
     RefWatcher install(@NonNull Application application) {
-        return refWatcher(application)
+        return refWatcher(application)//创建一个 AndroidRefWatcherBuilder
                 .listenerServiceClass(DisplayLeakService.class)//设置处理结果的service为 DisplayLeakService
-                .excludedRefs(AndroidExcludedRefs.createAppDefaults().build())//排查已知厂商的泄漏点
-                .buildAndInstall();
+                .excludedRefs(AndroidExcludedRefs.createAppDefaults().build())//排查已知厂商的泄漏点 内部将 泄漏点记录到了 ServiceHeapDumpListener中
+                .buildAndInstall();//创建 RefWatcher 并给activity fragment设置生命周期啊监听
     }
 
     /**

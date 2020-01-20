@@ -88,15 +88,18 @@ public class RefWatcherBuilder<T extends RefWatcherBuilder<T>> {
 
     /**
      * Creates a {@link RefWatcher}.
-     *
+     * <p>
      * build方法中 基本上都会走到default...方法中 。也就会调用 AndroidRefWatcherBuilder 中的方法
      */
     public final RefWatcher build() {
+        System.out.println("LeakCanary isDisabled= " + isDisabled());
+
+        //常亮false
         if (isDisabled()) {
             return RefWatcher.DISABLED;
         }
 
-        //设置 预设的排除项
+        //设置 预设的排除项，这里已经不为null了 在LeakCanary的 install 方法中已经设置了
         if (heapDumpBuilder.excludedRefs == null) {
             heapDumpBuilder.excludedRefs(defaultExcludedRefs());
         }
@@ -140,6 +143,7 @@ public class RefWatcherBuilder<T extends RefWatcherBuilder<T>> {
                 heapDumpBuilder);
     }
 
+    //这个应该是一个预制的开关吧。当不可用的时候 直接置为false就 不会进行监控了
     protected boolean isDisabled() {
         return false;
     }
