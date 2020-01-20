@@ -283,7 +283,7 @@ public final class DisplayLeakActivity extends Activity {
     listView.setVisibility(VISIBLE);
     failureView.setVisibility(GONE);
 
-    //某个卸扣的详情
+    //某个泄漏的详情
     if (visibleLeak != null) {
       AnalysisResult result = visibleLeak.result;
       actionButton.setVisibility(VISIBLE);
