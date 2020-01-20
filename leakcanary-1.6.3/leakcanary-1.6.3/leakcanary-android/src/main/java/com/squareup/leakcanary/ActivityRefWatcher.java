@@ -40,6 +40,7 @@ public final class ActivityRefWatcher {
         Application application = (Application) context.getApplicationContext();
         ActivityRefWatcher activityRefWatcher = new ActivityRefWatcher(application, refWatcher);
 
+        //添加全局生命周期监听
         application.registerActivityLifecycleCallbacks(activityRefWatcher.lifecycleCallbacks);
     }
 

@@ -101,6 +101,7 @@ public final class AndroidRefWatcherBuilder extends RefWatcherBuilder<AndroidRef
         }
         //创建 RefWatcher
         RefWatcher refWatcher = build();
+        //因为 DISABLED 也会被实例化 所以这里要加上判断
         if (refWatcher != DISABLED) {
             //是否展示默认的泄漏activity
             if (enableDisplayLeakActivity) {
