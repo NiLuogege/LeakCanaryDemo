@@ -99,6 +99,7 @@ public final class HeapAnalyzer {
         this.excludedRefs = excludedRefs;
         this.listener = listener;
 
+        //创建可达性检测者对象并存放在 reachabilityInspectors中
         this.reachabilityInspectors = new ArrayList<>();
         for (Class<? extends Reachability.Inspector> reachabilityInspectorClass : reachabilityInspectorClasses) {
             try {
@@ -225,7 +226,9 @@ public final class HeapAnalyzer {
         return String.format("%s@0x%08x", root.getRootType().getName(), root.getId());
     }
 
+    //查找泄漏的引用对象
     private Instance findLeakingReference(String key, Snapshot snapshot) {
+        //找到所有的 KeyedWeakReference class
         ClassObj refClass = snapshot.findClass(KeyedWeakReference.class.getName());
         if (refClass == null) {
             throw new IllegalStateException(
@@ -247,6 +250,7 @@ public final class HeapAnalyzer {
 
             //是泄漏点的 key 则将泄漏的引用 返回
             if (keyCandidate.equals(key)) {
+                //返回泄漏的对象
                 return fieldValue(values, "referent");
             }
             keysFound.add(keyCandidate);
@@ -372,6 +376,7 @@ public final class HeapAnalyzer {
         return new LeakTrace(elements, expectedReachability);
     }
 
+    //分析可达性，具体不在清楚
     private List<Reachability> computeExpectedReachability(
             List<LeakTraceElement> elements) {
         int lastReachableElement = 0;
