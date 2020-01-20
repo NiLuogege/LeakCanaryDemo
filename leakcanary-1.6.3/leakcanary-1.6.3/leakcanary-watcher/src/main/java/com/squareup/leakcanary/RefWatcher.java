@@ -77,7 +77,7 @@ public final class RefWatcher {
      * @param referenceName An logical identifier for the watched object.
      */
     public void watch(Object watchedReference, String referenceName) {
-        //如果不可用直接 返回
+        //这里应该是做了一层重复检查，因为正常逻辑不会执行到这里
         if (this == DISABLED) {
             return;
         }
@@ -90,6 +90,7 @@ public final class RefWatcher {
         //将watchedReference 使用 WeakReference 进行包装 生成一个弱引用对象，并且绑定一个 key
         final KeyedWeakReference reference = new KeyedWeakReference(watchedReference, key, referenceName, queue);
 
+        //延时一段时间后并且空闲时进行观察（默认5秒）
         ensureGoneAsync(watchStartNanoTime, reference);
     }
 
@@ -115,7 +116,7 @@ public final class RefWatcher {
     }
 
     private void ensureGoneAsync(final long watchStartNanoTime, final KeyedWeakReference reference) {
-        //在 watchExecutor 中延时 一段时间后执行 ensureGone
+        //在 watchExecutor 中延时 一段时间后并且空闲时执行 ensureGone
         watchExecutor.execute(new Retryable() {
             @Override
             public Retryable.Result run() {

@@ -48,6 +48,7 @@ public final class ActivityRefWatcher {
             new ActivityLifecycleCallbacksAdapter() {
                 @Override
                 public void onActivityDestroyed(Activity activity) {
+                    //RefWatcher 观察 activity
                     refWatcher.watch(activity);
                 }
             };
